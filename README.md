@@ -9,8 +9,8 @@ Go script to scrape a popular Spanish website for flat renting. It will send an 
 
 - [ ] Save to csv
 - [ ] Save to DB
-- [ ] Searching across different areas
-- [ ] Concurrent search 
+- [X] Searching across different areas
+- [X] Concurrent search 
 - [ ] Filter with more options
 - [ ] Improve email formatting
 

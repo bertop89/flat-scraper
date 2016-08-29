@@ -5,24 +5,31 @@ import (
 	"log"
 	"net/smtp"
 	"time"
+  "strings"
 )
 
 
 type Configuration struct {
   Email			string 
   Pass			string
-  Areas			string
+  Areas			[]string
 }
+
+
 
 func LoadConfig() Configuration {
 
 	var config Configuration
 
+  var tempAreas string
+
 	flag.StringVar(&config.Email,"email","","Gmail address to send the results to")
 	flag.StringVar(&config.Pass,"pass","","Password for that gmail account")
-	flag.StringVar(&config.Areas,"areas","tetuan","Areas to scrape")
+	flag.StringVar(&tempAreas,"areas","tetuan","Areas to scrape")
 
 	flag.Parse()
+
+  config.Areas = strings.Split(tempAreas,",")
 	
 	if config.Email == "" || config.Pass == "" {
 		log.Fatal("Invalid email or password parameter")
