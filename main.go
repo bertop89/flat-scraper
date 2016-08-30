@@ -9,6 +9,7 @@ import (
   "flat-scraper/utils"
   "fmt"
   "sync"
+  "bytes"
 )
 
 func FlatScraper(c utils.Configuration) []flat.Flat {
@@ -70,7 +71,6 @@ func FlatScraper(c utils.Configuration) []flat.Flat {
 
   for response := range flatResponses {
       finalList = append(finalList, response...)
-      fmt.Println("receiving data... size %d", len(finalList))
   }
 
   return finalList
@@ -78,19 +78,28 @@ func FlatScraper(c utils.Configuration) []flat.Flat {
   
 }
 
-func Filter(vs []flat.Flat) string {
-    vsf := make([]string, 0)
+func Filter(vs []flat.Flat, c utils.Configuration) []flat.Flat {
+    var vsf []flat.Flat
     for _, v := range vs {
-        if v.Price<= 650 && v.Size >= 50 {
-            vsf = append(vsf, v.ToString())
+        if v.Price<= c.Price && v.Size >= c.Size {
+            vsf = append(vsf, v)
         }
     }
-    return strings.Join(vsf,"")
+    return vsf
 }
 
 func main() {
   config := utils.LoadConfig()
+
   resultList := FlatScraper(config)
-  filteredListText := Filter(resultList)
-  utils.EmailSend(config, filteredListText)
+  filteredList := Filter(resultList, config)
+
+  filteredLength := strconv.Itoa(len(filteredList))
+  var buffer bytes.Buffer
+  for _,v := range filteredList {
+      buffer.WriteString(v.ToString()+"\n")
+  }
+  filteredListText := buffer.String()
+
+  utils.EmailSend(config, filteredLength, filteredListText)
 }
