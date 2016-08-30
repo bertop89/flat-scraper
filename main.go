@@ -14,8 +14,6 @@ import (
 
 func FlatScraper(c utils.Configuration) []flat.Flat {
 
-  
-
   flatResponses := make(chan []flat.Flat)
 
   var wg sync.WaitGroup
@@ -32,12 +30,10 @@ func FlatScraper(c utils.Configuration) []flat.Flat {
         log.Fatal(err)
       }
 
-      // Find the review items
       doc.Find(".items-container article").Each(func(i int, s *goquery.Selection) {
-        // For each item found, get the band and title
         name := s.Find("a").Text()
         price, err := strconv.Atoi(strings.Replace(strings.Split(s.Find(".item-price").Text(),"€")[0],".","",-1))
-        var rooms, size, store int
+        var rooms, size, store, id int
         var elevator bool = false
         s.Find(".item-detail").Each(func(i int, sel *goquery.Selection) {
           item := sel.Text()
@@ -53,8 +49,11 @@ func FlatScraper(c utils.Configuration) []flat.Flat {
           }
         })
         link := s.Find("a").AttrOr("href", "")
-        var current = flat.Flat{name, price, rooms, size, store, elevator, link}
-        resultList = append(resultList,current)
+        if strings.Contains(link, "/inmueble/") {
+            id, err = strconv.Atoi(strings.Split(link, "/")[2])
+            var current = flat.Flat{id, name, price, rooms, size, store, elevator, link, area}
+            resultList = append(resultList,current)
+        }
       })
       fmt.Printf("%s finishes with size %d \n",area,len(resultList))
       flatResponses <- resultList
@@ -81,7 +80,9 @@ func FlatScraper(c utils.Configuration) []flat.Flat {
 func Filter(vs []flat.Flat, c utils.Configuration) []flat.Flat {
     var vsf []flat.Flat
     for _, v := range vs {
-        if v.Price<= c.Price && v.Size >= c.Size {
+        if v.Price<= c.Price && 
+           v.Size >= c.Size &&
+           v.Elevator && v.Store > 1 {
             vsf = append(vsf, v)
         }
     }

@@ -3,7 +3,7 @@ Go script to scrape a popular Spanish website for flat renting. It will send an 
 ### Example
 
 ```
-./main -email=mygmailaccount -pass=mypassword -areas=tetuan
+./main -email=mygmailaccount -pass=mypassword -areas=tetuan,chamartin -price=650 -size=40
 ```
 ### RoadMap
 
@@ -11,7 +11,7 @@ Go script to scrape a popular Spanish website for flat renting. It will send an 
 - [ ] Save to DB
 - [X] Searching across different areas
 - [X] Concurrent search 
-- [ ] Filter with more options
+- [X] Filter with more options
 - [ ] Improve email formatting
 
 ### Dependencies

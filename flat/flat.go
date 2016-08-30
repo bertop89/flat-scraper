@@ -5,6 +5,7 @@ import (
 )
 
 type Flat struct {
+	Id int
 	Name string
 	Price int
 	Rooms int
@@ -12,8 +13,9 @@ type Flat struct {
 	Store int
 	Elevator bool
 	Link string
+	Area string
 }
 
 func (f *Flat) ToString() string {
-	return fmt.Sprintf("[ %d € ] | %d m² | %s https://www.idealista.com%s \n", f.Price, f.Size, f.Name, f.Link)
+	return fmt.Sprintf("[ %d € ] | %d m² | %s https://www.idealista.com%s", f.Price, f.Size, f.Name, f.Link)
 }
