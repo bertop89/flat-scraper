@@ -7,6 +7,7 @@ import (
   "strconv"
   "flat-scraper/flat"
   "flat-scraper/utils"
+  "flat-scraper/db"
   "fmt"
   "sync"
   "bytes"
@@ -23,7 +24,6 @@ func FlatScraper(c utils.Configuration) []flat.Flat {
   for _, area := range c.Areas {
     go func(area string) {
       fmt.Println(area+" starts")
-      //defer wg.Done()
       var resultList []flat.Flat
       doc, err := goquery.NewDocument("https://www.idealista.com/alquiler-viviendas/madrid/"+area+"/con-pisos,estado_buen-estado,amueblado_amueblados/") 
       if err != nil {
@@ -94,6 +94,8 @@ func main() {
 
   resultList := FlatScraper(config)
   filteredList := Filter(resultList, config)
+
+  database_handler.FlatInsert(resultList)
 
   filteredLength := strconv.Itoa(len(filteredList))
   var buffer bytes.Buffer

@@ -7,8 +7,7 @@ Go script to scrape a popular Spanish website for flat renting. It will send an 
 ```
 ### RoadMap
 
-- [ ] Save to csv
-- [ ] Save to DB
+- [X] Save to DB
 - [X] Searching across different areas
 - [X] Concurrent search 
 - [X] Filter with more options
