@@ -9,7 +9,7 @@ import (
 	"log"
 )
 
-func FlatInsert(flats []flat.Flat) {
+func FlatInsert(flats []flat.Flat) []flat.Flat {
 	db, err := sql.Open("postgres", "user=postgres password='postgres' dbname=flats")
 	if err != nil {
 		log.Fatal(err)
@@ -24,10 +24,32 @@ func FlatInsert(flats []flat.Flat) {
 
 	t := time.Now()
 	t_str := fmt.Sprintf("%d-%02d-%02d",t.Year(), t.Month(), t.Day())
-	for _,v := range flats {
-		query := fmt.Sprintf("INSERT INTO flats(id,name,price,rooms,size,store,elevator,link,area,date_published)" +
-			" VALUES (%d,'%s',%d,%d,%d,%d,%t,'%s','%s','%s');", v.Id, v.Name, v.Price, v.Rooms, v.Size, v.Store, 
-			v.Elevator, v.Link, v.Area, t_str)
-		db.QueryRow(query)
+	
+	var newFlats []flat.Flat
+	
+	checkQuery, err := db.Prepare("select exists(select 1 from flats where id=$1) AS \"exists\";")
+	if err != nil {
+	  log.Fatal(err)
 	}
+
+	insertQuery, err := db.Prepare("INSERT INTO flats(id,name,price,rooms,size,store,elevator,link,area,date_published)" +
+			" VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10);")
+	if err != nil {
+	  log.Fatal(err)
+	}
+
+	var checkRes bool
+	for _,v := range flats {
+		
+		err = checkQuery.QueryRow(v.Id).Scan(&checkRes)
+		
+		if (!checkRes) {
+		  insertQuery.Exec(v.Id, v.Name, v.Price, v.Rooms, v.Size, v.Store, v.Elevator, v.Link, v.Area, t_str)
+		  
+		  newFlats = append(newFlats,v)
+		}
+		
+	}
+	
+	return newFlats
 }

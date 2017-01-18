@@ -93,16 +93,20 @@ func main() {
   config := utils.LoadConfig()
 
   resultList := FlatScraper(config)
-  filteredList := Filter(resultList, config)
+  
+  newFlats := database_handler.FlatInsert(resultList)
+  
+  filteredList := Filter(newFlats, config)
 
-  database_handler.FlatInsert(resultList)
-
-  filteredLength := strconv.Itoa(len(filteredList))
-  var buffer bytes.Buffer
-  for _,v := range filteredList {
+  if (len(filteredList) > 0) {
+  
+    filteredLength := strconv.Itoa(len(filteredList))
+    var buffer bytes.Buffer
+    for _,v := range filteredList {
       buffer.WriteString(v.ToString()+"\n")
+    }
+    filteredListText := buffer.String()
+    utils.EmailSend(config, filteredLength, filteredListText)
+    
   }
-  filteredListText := buffer.String()
-
-  utils.EmailSend(config, filteredLength, filteredListText)
 }
